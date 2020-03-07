@@ -1,0 +1,152 @@
+Problem Description
+ 
+Let's say there are 100 light bulbs lined up in a row in a long room.  Each bulb has its own switch and is currently switched 
+off.  The room has an entry door and an exit door.  There are 100 people lined up outside the entry door.  Each bulb is
+numbered consecutively from 1 to 100.  So is each person.
+ 
+Person No. 1 enters the room, switches on every bulb, and exits.  Person No. 2 enters and flips the switch on every 
+second bulb (turning off bulbs 2, 4, 6, etc.)  Person No. 3 enters and flips the switch on every third bulb (changing 
+the state on bulbs 3, 6, 9, and so forth).  This continues until all 100 people have passed through the room.
+ 
+How many of the light bulbs are illuminated after the 100th person has passed through the room?  More specifically, 
+which light bulbs are still illuminated?
+
+
+
+
+SOLUTION  Console Application.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LightBulbsUI
+{
+    class Bulbs
+    {
+        static int[] peopleLine;
+        static int[] lightBulbs;
+        static bool[] lightBulbsState;
+
+        static void Main(string[] args)
+        {
+            //interface title
+            Console.WriteLine("BULB SWITCH");
+            Console.WriteLine();
+
+            //People input
+            Console.WriteLine("Enter People:");
+            var inputPeople = Console.ReadLine();
+            //validate input
+            inputPeople =  InputValidation(inputPeople);
+
+            //Bulbs input
+            Console.WriteLine("Enter bulbs:");
+            var inputBulbs = Console.ReadLine();
+            //validate input
+            inputBulbs = InputValidation(inputBulbs);
+
+
+            //set initial value to people and bulbs arrays
+            SetUpPeopleData(Convert.ToInt32(inputPeople));
+            SetUpLightBulbsData(Convert.ToInt32(inputBulbs));
+
+            //switch all bulbs state
+            SwitchBulbs();
+
+            Console.ReadLine();
+        }
+        private static void SwitchBulbs()
+        {
+            try
+            {
+                int lightBulbsLength = lightBulbs.Length;
+                lightBulbsState = new bool[lightBulbsLength];
+
+                //switch on lights
+                foreach (var personNumber in peopleLine)
+                {
+                    //change bulb state by person number
+                    changeBulbState(personNumber, lightBulbsLength, lightBulbsState);
+                }
+
+                //result: total bulbs still illuminated
+                var totalIlluminated = lightBulbsState.Count(n => n == true);
+
+                Console.WriteLine();
+                Console.Write("Total Bulbs Still Illuminated: " + totalIlluminated);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+            }
+    
+        }
+        private static void changeBulbState(int personNumber,int lightBulbsLength, bool[] lightBulbsState)
+        {
+            try
+            {
+              
+                int skipCount = 0;
+                skipCount = personNumber;
+
+                //loop throgh bulbs and switch them on
+                for (int i = 0; i < lightBulbsLength; i++)
+                {
+                    //calculate indexes to jump
+                    i += skipCount - 1;
+
+                    //check index out of range
+                    if (i < lightBulbsLength)
+                    {
+                        //toggle bulb states
+                        lightBulbsState[i] = lightBulbsState[i] == false ? true : false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        private static string  InputValidation(string input)
+        {
+            while (!input.All(char.IsNumber) || string.IsNullOrEmpty(input))
+            {
+                Console.WriteLine("Please, enter only positive numbers.");
+                Console.Beep();
+                input = Console.ReadLine();
+            }
+
+            //dont allow number too big
+            try
+            {
+                Convert.ToInt16(input);
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("The number es too big. Enter a smaller number");
+                Console.Beep();
+                input = Console.ReadLine();
+            }
+
+            return input;
+        }
+
+        #region SetUp Initial Values
+        private static void SetUpLightBulbsData(int totalRange)
+        {
+            lightBulbs = Enumerable.Range(1, totalRange).ToArray();
+        }
+
+        private static void SetUpPeopleData(int totalRange)
+        {
+            // Adding value to existing list
+            peopleLine = Enumerable.Range(1, totalRange).ToArray();
+        }
+        #endregion
+
+    }
+}
